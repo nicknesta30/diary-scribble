@@ -25,8 +25,14 @@ const ForgotPassword: React.FC = () => {
     }
 
     setIsLoading(true);
-    const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+    const envUrl = (import.meta.env.VITE_APP_URL as string | undefined)?.trim();
+    if (!envUrl) {
+      console.error('VITE_APP_URL not set – defaulting to current origin');
+    }
+    const appUrl = envUrl || window.location.origin;
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // The app uses HashRouter, so include `#/`.
       redirectTo: `${appUrl}/#/reset-password`,
     });
 
